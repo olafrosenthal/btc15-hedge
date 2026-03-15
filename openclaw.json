@@ -12,13 +12,15 @@
       "maxTokens": 1024,
       "timeoutMs": 8000
     },
-    "fallback": {
-      "provider": "opencode-go",
-      "model": "opencode-go/minimax-m2.5",
-      "baseUrl": "https://opencode.ai/zen/go/v1",
-      "temperature": 0.0,
-      "timeoutMs": 8000
-    }
+    "fallbackChain": [
+      {
+        "provider": "opencode-go",
+        "model": "opencode-go/minimax-m2.5",
+        "baseUrl": "https://opencode.ai/zen/go/v1",
+        "temperature": 0.0,
+        "timeoutMs": 8000
+      }
+    ]
   },
   "security": {
     "allowLocalExecution": true,

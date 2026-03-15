@@ -2,7 +2,7 @@
 
 Production-grade autonomous trading agent for Polymarket 15-minute BTC prediction markets with Bayesian probability estimation, fee-aware Kelly criterion, and continuous learning via SQLite memory.
 
-> **Disclaimer:** This software is provided as-is for educational and experimental purposes. It is not financial advice. Trading prediction markets involves risk of loss.Use at your own risk and only with funds you can afford to lose.
+> **Disclaimer:** This software is provided as-is for educational and experimental purposes. It is not financial advice. Trading prediction markets involves risk of loss. Use at your own risk and only with funds you can afford to lose.
 
 ## Features
 
@@ -69,7 +69,7 @@ uv run python scripts/heartbeat.py --dry-run
 uv run python scripts/heartbeat.py --status
 
 # Run backtest simulation
-uv run python scripts/backtest.py --simulations 1000--seed 42
+uv run python scripts/backtest.py --simulations 1000 --seed 42
 ```
 
 ## Usage
@@ -389,7 +389,7 @@ export CLOB_MAX_RETRIES=10
 | CTF Exchange | `0x4bFb41d5B3570DeFd03C39a9A4D8dE6Bd8B8982E` |
 | Neg Risk CTF Exchange | `0xC5d563A36AE78145C45a50134d48A1215220f80a` |
 
-##License
+## License
 
 Apache 2.0
 
