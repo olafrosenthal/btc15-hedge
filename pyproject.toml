@@ -11,6 +11,12 @@ dependencies = [
     "eth-account>=0.13.0",
     "python-dotenv>=1.0.0",
     "python-telegram-bot>=21.0.0",
+    "numpy>=1.24.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0.0",
 ]
 
 [build-system]

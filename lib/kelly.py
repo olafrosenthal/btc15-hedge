@@ -12,7 +12,21 @@ OBFUSCATION_VARIANCE = 0.05
 
 
 def calculate_polymarket_fee(q: float) -> float:
-    return FEE_RATE_CONSTANT * 2 * (q * (1 - q)) ** FEE_RATE_EXPONENT
+    """
+    Calculate Polymarket March 2026 fee formula.
+    
+    Formula: fee_per_share = 0.25 * q * (q * (1-q))^2
+    Effective drag = fee_per_share / q (since share price is q)
+    
+    At q=0.5: effective_drag ≈ 3.125%
+    """
+    if not (0.001 < q < 0.999):
+        return 0.0
+    
+    fee_per_share = FEE_RATE_CONSTANT * q * (q * (1 - q)) ** FEE_RATE_EXPONENT
+    effective_drag = fee_per_share / q
+    
+    return effective_drag
 
 
 @dataclass
@@ -86,13 +100,15 @@ class KellySizer:
         if b <= 0:
             return 0.0
             
-        f_star = p - (1 - p) / b
+        # Kelly formula: f* = [(p-q)*b - (1-p)] / b
+        # Where b = (1-q)/q is the odds
+        f_star = ((p - q) * b - (1 - p)) / b
         
         if f_star <= 0:
             return 0.0
             
         if self.half_kelly:
-            f_star = f_star / 2
+            f_star = f_star * 0.5
         
         size = f_star * bankroll
         
