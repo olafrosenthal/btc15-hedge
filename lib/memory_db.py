@@ -36,10 +36,21 @@ class Lesson:
 
 
 class MemoryDB:
-    def __init__(self, db_path: str = DEFAULT_DB_PATH):
+    def __init__(self, db_path: str = DEFAULT_DB_PATH) -> None:
         self.db_path = db_path
-        self._conn = None
+        self._conn: Optional[sqlite3.Connection] = None
         self._ensure_tables()
+
+    def __enter__(self) -> "MemoryDB":
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb) -> None:
+        self.close()
+
+    def close(self) -> None:
+        if self._conn is not None:
+            self._conn.close()
+            self._conn = None
 
     def _get_conn(self) -> sqlite3.Connection:
         if self._conn is None:
@@ -47,7 +58,7 @@ class MemoryDB:
             self._conn.row_factory = sqlite3.Row
         return self._conn
 
-    def _ensure_tables(self):
+    def _ensure_tables(self) -> None:
         conn = self._get_conn()
         conn.execute("""
             CREATE TABLE IF NOT EXISTS trades (
@@ -86,7 +97,7 @@ class MemoryDB:
         )
         return cursor.fetchone() is not None
 
-    def log_trade(self, trade: Trade):
+    def log_trade(self, trade: Trade) -> None:
         conn = self._get_conn()
         conn.execute("""
             INSERT INTO trades (timestamp, market_id, p_prior, p_posterior, q_market,
@@ -100,7 +111,7 @@ class MemoryDB:
         conn.commit()
 
     def update_lesson(self, market_id: str, prior_modifier: float, insight: str,
-                      win_count: int = 0, loss_count: int = 0):
+                      win_count: int = 0, loss_count: int = 0) -> None:
         conn = self._get_conn()
         created_at = datetime.now(timezone.utc).isoformat()
         conn.execute("""
@@ -183,7 +194,7 @@ class MemoryDB:
             "avg_latency_ms": row["avg_latency_ms"]
         }
 
-    def append_to_memory_file(self, trade: Trade, memory_file: str = "MEMORY.md"):
+    def append_to_memory_file(self, trade: Trade, memory_file: str = "MEMORY.md") -> None:
         log_entry = {
             "timestamp": trade.timestamp,
             "market_id": trade.market_id,
