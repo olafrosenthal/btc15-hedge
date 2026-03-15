@@ -27,6 +27,7 @@ MAX_RISK_USD = float(os.environ.get("MAX_RISK_USD", "2.0"))
 EDGE_THRESHOLD = float(os.environ.get("EDGE_THRESHOLD", "0.035"))
 HEDGE_RATIO = float(os.environ.get("HEDGE_RATIO", "0.25"))
 INITIAL_BANKROLL = float(os.environ.get("INITIAL_BANKROLL", "20.0"))
+DRAWDOWN_THRESHOLD = float(os.environ.get("DRAWDOWN_THRESHOLD", "0.50"))  # Halt at 50% loss
 MEMORY_FILE = os.environ.get("MEMORY_FILE", "MEMORY.md")
 MEMORY_DB_PATH = os.environ.get("MEMORY_DB_PATH", "/opt/google-memory-agent/data/memory.db")
 
@@ -58,6 +59,14 @@ async def execute_heartbeat(dry_run: bool = False) -> dict:
     bankroll = balances.usdc_e
     if bankroll <= 0:
         bankroll = INITIAL_BANKROLL
+    
+    # Circuit breaker: halt if drawdown exceeds threshold
+    if bankroll < INITIAL_BANKROLL * (1 - DRAWDOWN_THRESHOLD):
+        return {
+            "status": "halted",
+            "error": f"Drawdown exceeded: bankroll ${bankroll:.2f} below {(1-DRAWDOWN_THRESHOLD)*100}% of initial ${INITIAL_BANKROLL:.2f}",
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+        }
     
     try:
         market = await find_btc_15min_market(gamma)
