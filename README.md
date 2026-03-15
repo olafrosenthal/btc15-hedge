@@ -343,6 +343,108 @@ uv run python scripts/polyclaw.py wallet approve
 
 Apache 2.0
 
+---
+
+## BTC15-Hedge: Autonomous Trading Agent
+
+Production-grade autonomous trading agent for Polymarket 15-minute BTC prediction markets.
+
+### Features
+
+- **Bayesian Probability Engine** - Calculates posterior probability from order book signals
+- **Fee-Aware Kelly Criterion** - Accounts for Polymarket's March 2026 dynamic fee structure
+- **3.5% Edge Threshold** - Mathematically filters trades to survive fee drag
+- **SQLite Memory Persistence** - Stores trade history for continuous learning
+- **Telegram Safety Controls** - /status, /halt, /resume, /memory commands
+- **50% Drawdown Circuit Breaker** - Auto-halts on catastrophic losses
+- **Backtest Framework** - Historical simulation with exact fee calculation
+
+### Quick Start
+
+```bash
+# Dry-run mode (recommended for testing)
+uv run python scripts/heartbeat.py --dry-run
+
+# Check system status
+uv run python scripts/heartbeat.py --status
+
+# Run backtest simulation
+uv run python scripts/backtest.py --simulations 1000
+
+# Start Telegram safety bot
+uv run python scripts/telegram_bot.py
+```
+
+### Risk Management
+
+| Parameter | Default | Description |
+|-----------|---------|-------------|
+| `MAX_RISK_USD` | 2.0 | Maximumper-cycle capital risk |
+| `EDGE_THRESHOLD` | 0.035 | Minimum edge after fees (3.5%) |
+| `DRAWDOWN_THRESHOLD` | 0.50 | Halt at50% loss |
+| `HEDGE_RATIO` | 0.25 | Opposite-side hedge size |
+
+### Cron Scheduling
+
+For automated 15-minute execution:
+
+```bash
+# Add to crontab
+*/15 * * * * cd /path/to/btc15-hedge && uv run python scripts/heartbeat.py >> /var/log/btc15.log 2>&1
+```
+
+### Telegram Commands
+
+| Command | Description |
+|---------|-------------|
+| `/status` | Show wallet, bankroll, trade count, memory prior |
+| `/halt` | Enter monitor-only mode (sets MAX_RISK=0) |
+| `/resume` | Resume live trading |
+| `/memory` | Show recent consolidation lessons |
+
+### Integration with OpenClaw
+
+This repository is an OpenClaw skill. To integrate:
+
+1. **Copy to OpenClaw skills directory:**
+```bash
+cp -r btc15-hedge ~/.openclaw/skills/
+```
+
+2. **Configure agent personality files:**
+- `IDENTITY.md` - MiroFish-Alpha persona definition
+- `SOUL.md` - Quantitative logic boundaries and constraints
+- `MEMORY.md` - Execution log (appended by heartbeat)
+
+3. **Set environment in `/opt/openclaw.env`:**
+```bash
+POLYGON_PRIVATE_KEY=0x...
+POLYGON_CHAIN_ID=137
+POLYMARKET_HOST=https://clob.polymarket.com
+MAX_RISK_USD=2.0
+EDGE_THRESHOLD=0.035
+INITIAL_BANKROLL=20.0
+```
+
+### Architecture
+
+```
+btc15-hedge/
+├── lib/
+│   ├── bayesian.py      # Probability estimation from order books
+│   ├── kelly.py         # Fee-aware position sizing
+│   ├── memory_db.py     # SQLite persistence layer
+│   └── market_discovery.py # BTC15-min market finder
+├── scripts/
+│   ├── heartbeat.py     # Main 15-min execution loop
+│   ├── backtest.py      # Historical simulation
+│   └── telegram_bot.py  # Safety controls
+├── tests/               # Test suite
+├── IDENTITY.md          # Agent persona
+├── SOUL.md              # Behavioral constraints
+└── MEMORY.md            # Execution log
+```
+
 ## Credits
 
 Based on [polymarket-alpha-bot](https://github.com/chainstacklabs/polymarket-alpha-bot) by Chainstack.
