@@ -207,3 +207,34 @@ uv run python scripts/polyclaw.py wallet approve
 ## License
 
 Apache 2.0
+
+## btc15-hedge: Autonomous Trading
+
+The btc15-hedge skill provides autonomous 15-minute BTC trading with Bayesian probability estimation.
+
+### Commands
+
+```bash
+# Run single heartbeat cycle (dry-run)
+uv run python scripts/heartbeat.py --dry-run
+
+# Check system status
+uv run python scripts/heartbeat.py --status
+
+# Run backtest simulation
+uv run python scripts/backtest.py --simulations 1000
+
+# Start Telegram safety bot
+uv run python scripts/telegram_bot.py
+```
+
+### Environment Variables
+
+| Variable | Required | Description |
+|----------|----------|-------------|
+| `MAX_RISK_USD` | Yes | Maximum risk per cycle (default: 2.0) |
+| `EDGE_THRESHOLD` | No | Minimum edge for execution (default: 0.035) |
+| `HEDGE_RATIO` | No | Hedge ratio for opposite side (default: 0.25) |
+| `INITIAL_BANKROLL` | No | Initial capital for drawdown calculation |
+| `TELEGRAM_BOT_TOKEN` | Optional | Telegram bot token for safety controls |
+| `TELEGRAM_ALLOWED_CHAT_ID` | Optional | Authorized chat ID |
